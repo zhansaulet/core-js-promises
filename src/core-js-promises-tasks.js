@@ -102,8 +102,19 @@ function getFirstPromiseResult(promises) {
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)] => Promise rejected with 2
  */
-function getAllOrNothing(/* promises */) {
-  throw new Error('Not implemented');
+function getAllOrNothing(promises) {
+  return new Promise((resolve, reject) => {
+    const values = [];
+    promises.forEach((promise) => {
+      promise.then(
+        (value) => {
+          values.push(value);
+          if (promises.length === values.length) resolve(values);
+        },
+        (error) => reject(error)
+      );
+    });
+  });
 }
 
 /**
@@ -118,8 +129,21 @@ function getAllOrNothing(/* promises */) {
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)]  => Promise fulfilled with [1, null, 3]
  */
-function getAllResult(/* promises */) {
-  throw new Error('Not implemented');
+function getAllResult(promises) {
+  return new Promise((resolve) => {
+    const values = [];
+    promises.forEach((promise, index) => {
+      promise
+        .then((value) => {
+          values[index] = value;
+          if (values.length === promises.length) resolve(values);
+        })
+        .catch(() => {
+          values[index] = null;
+          if (values.length === promises.length) resolve(values);
+        });
+    });
+  });
 }
 
 /**
